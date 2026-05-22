@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Lukasz P. Orlowski <lukasz@orlowski.io>
+
+name: agents
+
+services:
+  vllm:
+    image: ${IMAGE}
+    container_name: vllm
+    ipc: host
+    # You may need to adjust seccomp settings for vLLM depending on your environment and use case
+    security_opt:
+      - seccomp=unconfined
+    # No custom entrypoint
+    command:
+      - python3
+      - -m
+      - vllm.entrypoints.openai.api_server
+      - --model=${HF_MODEL_NAME}
+      - --served-model-name=${SERVED_MODEL_NAME}
+      - --host=${VLLM_ADDR}
+      - --port=${VLLM_PORT}
+      - --max-model-len=${CONTEXT_LEN}
+      - --gpu-memory-utilization=${GPU_MEM_UTIL}
+      - --max-num-seqs=${MAX_NUM_SEQS}
+      - --max-num-batched-tokens=${MAX_NUM_BATCHED_TOKENS}
+      - --reasoning-parser=${REASONING_PARSER}
+      - --tool-call-parser=${TOOL_CALL_PARSER}
+      - --enable-auto-tool-choice
+      - --attention-backend=flashinfer
+      - --enable-prefix-caching
+      - --enable-chunked-prefill
+      - --max-cudagraph-capture-size=${MAX_CUDAGRAPH_CAPTURE_SIZE}
+      - --speculative-config={"method":"mtp","num_speculative_tokens":1}
+      - --trust-remote-code
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      # FlashInfer MoE tuning
+      - VLLM_FLASHINFER_MOE_BACKEND=latency
+      - VLLM_USE_FLASHINFER_MOE_FP16=1
+      # Blackwell / Marlin GEMM backend (no-op for BF16; useful if switching to NVFP4)
+      - VLLM_NVFP4_GEMM_BACKEND=marlin
+      - VLLM_MARLIN_USE_ATOMIC_ADD=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              count: all
+    ports:
+      - ${VLLM_ADDR}:${VLLM_PORT}:${VLLM_PORT}
+    volumes:
+      - $WD:/var/workspace
+      - $VLLM_CACHE_DIR:/root/.cache
+      - $VLLM_CACHE_DIR/flashinfer:/root/.cache/flashinfer
+    networks:
+      agents:
+
+networks:
+  agents:
+    name: agents-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.0.0/24
+          gateway: 10.10.0.1
