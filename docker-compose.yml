@@ -33,6 +33,7 @@ services:
       - --max-cudagraph-capture-size=${MAX_CUDAGRAPH_CAPTURE_SIZE}
       - --speculative-config={"method":"mtp","num_speculative_tokens":1}
       - --trust-remote-code
+      - --api-key ${VLLM_API_KEY}
     environment:
       - HF_TOKEN=${HF_TOKEN}
       # FlashInfer MoE tuning

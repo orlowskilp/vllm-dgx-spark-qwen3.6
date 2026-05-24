@@ -14,12 +14,14 @@ This project uses [direnv](https://direnv.net) for environment management. Once 
 eval "$(direnv hook bash)"
 ```
 
-Copy `.envrc.example` to `.envrc` and fill in your Hugging Face token:
+Copy `.envrc.example` to `.envrc` and fill in your Hugging Face token and vLLM API key:
 
 ```bash
 cp .envrc.example .envrc
 direnv allow
 ```
+
+**NOTE**: vLLM API key is an arbitrary sequence of characters of your choosing.
 
 ## Running
 
@@ -60,11 +62,13 @@ The average token generation rate is around 55–80 tokens/s.
 
 ## Claude Code Integration
 
-Add the following to your Claude Code environment to use this server as the default model:
+Add the following to your Claude Code environment (with e.g. `.envrc`) to use this server as the default model:
+
+**NOTE**: The `ANTHROPIC_API_KEY` below must be set to the same value as `VLLM_API_KEY` from the `.envrc`.
 
 ```bash
 export ANTHROPIC_BASE_URL="http://<dgx-host>:8000"
-unset ANTHROPIC_API_KEY
+export ANTHROPIC_API_KEY="<your-custom-vllm-api-key>"
 export ANTHROPIC_CUSTOM_MODEL_OPTION="qwen3.6"
 export ANTHROPIC_CUSTOM_MODEL_OPTION_NAME="Qwen3.6"
 export ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION="Local deployment on DGX Spark"
