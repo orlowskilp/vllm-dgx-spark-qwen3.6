@@ -20,6 +20,7 @@ services:
       - --kv-cache-dtype=fp8
       - --async-scheduling
       - --max-model-len=${CONTEXT_LEN}
+      - --linear-backend=${LINEAR_BE}
       - --gpu-memory-utilization=${GPU_MEM_UTIL}
       - --max-num-seqs=${MAX_NUM_SEQS}
       - --max-num-batched-tokens=${MAX_NUM_BATCHED_TOKENS}
@@ -31,18 +32,16 @@ services:
       - --enable-chunked-prefill
       - --moe-backend=${MOE_BE}
       - --load-format=fastsafetensors
+      - --compilation-config={"cudagraph_mode":"PIECEWISE"}
       - --max-cudagraph-capture-size=${MAX_CUDAGRAPH_CAPTURE_SIZE}
       - --speculative-config={"method":"mtp","num_speculative_tokens":${NUM_SPEC_TOKENS},"moe_backend":"triton"}
       - --limit-mm-per-prompt={"image":0,"video":0}
       - --trust-remote-code
     environment:
       - HF_TOKEN=${HF_TOKEN}
-      - VLLM_FLASHINFER_MOE_BACKEND=latency
-      - VLLM_USE_FLASHINFER_MOE_FP16=1
-      - VLLM_NVFP4_GEMM_BACKEND=marlin
       - VLLM_MARLIN_USE_ATOMIC_ADD=1
-      - VLLM_USE_FLASHINFER_MOE_FP4=0
       - FLASHINFER_DISABLE_VERSION_CHECK=1
+      # Ignored in this setup, but worth keeping for when b12x is fixed
       - CUTE_DSL_ARCH=sm_121a
     deploy:
       resources:

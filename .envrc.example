@@ -1,18 +1,19 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 Lukasz P. Orlowski <lukasz@orlowski.io>
 
-export IMAGE="vllm/vllm-openai:v0.23.0-cu129-ubuntu2404"
+export IMAGE="vllm/vllm-openai:v0.24.0-cu129-ubuntu2404"
 export VLLM_ADDR="0.0.0.0"
 export VLLM_PORT=8000
 export VLLM_CACHE_DIR=${HOME}/.cache
 export WD="./workspace"
-export HF_TOKEN="[REDACTED]"
+export HF_TOKEN="$(cat hf.token)"
 export HF_MODEL_NAME="nvidia/Qwen3.6-35B-A3B-NVFP4"
 export SERVED_MODEL_NAME="qwen3.6"
 export TOOL_CALL_PARSER="qwen3_coder"
 export REASONING_PARSER="qwen3"
 export ATTENTION_BE="flashinfer"
 export MOE_BE="marlin"
+export LINEAR_BE="auto"
 export MAX_NUM_BATCHED_TOKENS=$((2 ** 13))
 export GPU_MEM_UTIL=0.7
 export MAX_NUM_SEQS=16
