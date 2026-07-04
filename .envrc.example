@@ -1,19 +1,21 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 Lukasz P. Orlowski <lukasz@orlowski.io>
 
-export IMAGE="nvcr.io/nvidia/vllm:26.04-py3"
+export IMAGE="vllm/vllm-openai:v0.23.0-cu129-ubuntu2404"
 export VLLM_ADDR="0.0.0.0"
 export VLLM_PORT=8000
 export VLLM_CACHE_DIR=${HOME}/.cache
 export WD="./workspace"
-export HF_TOKEN="<your-hf-token>"
-export HF_MODEL_NAME="Qwen/Qwen3.6-35B-A3B"
+export HF_TOKEN="[REDACTED]"
+export HF_MODEL_NAME="nvidia/Qwen3.6-35B-A3B-NVFP4"
 export SERVED_MODEL_NAME="qwen3.6"
 export TOOL_CALL_PARSER="qwen3_coder"
 export REASONING_PARSER="qwen3"
-export MAX_NUM_BATCHED_TOKENS=$((2 ** 16))
-export GPU_MEM_UTIL=0.87
-export MAX_NUM_SEQS=8
+export ATTENTION_BE="flashinfer"
+export MOE_BE="marlin"
+export MAX_NUM_BATCHED_TOKENS=$((2 ** 13))
+export GPU_MEM_UTIL=0.7
+export MAX_NUM_SEQS=16
+export NUM_SPEC_TOKENS=2
 export CONTEXT_LEN=$((2 ** 18))
-export MAX_CUDAGRAPH_CAPTURE_SIZE=64
-export VLLM_API_KEY="<your-custom-vllm-api-key>"
+export MAX_CUDAGRAPH_CAPTURE_SIZE=$(($MAX_NUM_SEQS * ($NUM_SPEC_TOKENS + 1)))
