@@ -46,7 +46,7 @@ The API will be available at `http://<dgx-host>:8000`. If you intend to use it o
 | Property               | Value                              |
 | ---------------------- | ---------------------------------- |
 | Model                  | nvidia/Qwen3.6-35B-A3B-NVFP4       |
-| Context length         | 262,144 tokens                     |
+| Context length         | 524,288 (262,144 base × 2.0 YaRN)  |
 | Max sequences          | 16                                 |
 | GPU memory utilization | 70%                                |
 | Speculative decoding   | MTP (2 speculative tokens)         |
@@ -58,6 +58,12 @@ The API will be available at `http://<dgx-host>:8000`. If you intend to use it o
 ### Model quantization
 
 Switching to NVFP4 quantization on DGX Spark makes the model feel noticeably faster — output streams out quicker and the speculative decoding loop is more responsive. The quality trade-off compared to the full-precision unquantized version is small enough that the responsiveness gain is almost always worth it. If you can afford to drop the quantization (e.g. by increasing GPU memory availability), the BF16 model produces better outputs.
+
+### Context length scaling
+
+The RoPE implementation was switched from the model's default linear interpolation to YaRN with a factor of 2.0, extending the context window from 262,144 (256K) to 524,288 (512K) tokens.
+
+No context rot was observed on long sessions at 400K tokens, tested by referring to information introduced early in the context. However, decoding became noticeably slower once the context exceeded ~280K tokens — the attention mechanism's scan over the full context becomes the bottleneck. Autocompaction was tested with a kick-in threshold at 420K tokens, compacting old context before it grows large enough to cause slowdowns. Overall, based on current results, this is promising for everyday use.
 
 ### Optimization opportunities
 

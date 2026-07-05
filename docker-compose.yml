@@ -21,6 +21,7 @@ services:
       - --async-scheduling
       - --max-model-len=${CONTEXT_LEN}
       - --linear-backend=${LINEAR_BE}
+      - --hf-overrides={"rope_scaling":{"rope_type":"yarn","factor":${YARN_FACTOR},"original_max_position_embeddings":$ORIGINAL_MAX_POS_EMBEDDS}}
       - --gpu-memory-utilization=${GPU_MEM_UTIL}
       - --max-num-seqs=${MAX_NUM_SEQS}
       - --max-num-batched-tokens=${MAX_NUM_BATCHED_TOKENS}
@@ -40,6 +41,7 @@ services:
     environment:
       - HF_TOKEN=${HF_TOKEN}
       - VLLM_MARLIN_USE_ATOMIC_ADD=1
+      - VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
       - FLASHINFER_DISABLE_VERSION_CHECK=1
       # Ignored in this setup, but worth keeping for when b12x is fixed
       - CUTE_DSL_ARCH=sm_121a
